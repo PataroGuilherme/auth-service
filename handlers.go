@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"strings"
 )
 
 func (app *App) healthHandler(w http.ResponseWriter, r *http.Request) {
