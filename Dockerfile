@@ -2,25 +2,21 @@ FROM golang:1.22 AS builder
 
 WORKDIR /app
 
+# Copia SOMENTE os arquivos de dependências primeiro
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+# Agora copia TODOS os arquivos Go do serviço
+COPY *.go ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o auth-service main.go
+# Aqui rodamos o build
+RUN CGO_ENABLED=0 GOOS=linux go build -o auth-service .
 
 FROM alpine:3.20
 
 WORKDIR /app
 
 COPY --from=builder /app/auth-service .
-
-# Variáveis que serão fornecidas pelo docker-compose
-ENV DB_HOST=auth-db
-ENV DB_PORT=5432
-ENV DB_USER=postgres
-ENV DB_PASS=postgres
-ENV DB_NAME=authdb
 
 EXPOSE 8000 8080 80 443
 
